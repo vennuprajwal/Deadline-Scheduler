@@ -1,0 +1,22 @@
+{
+  "name": "deadline-scheduler",
+  "version": "1.0.0",
+  "description": "Job Sequencing with Deadlines and critical time slot analysis",
+  "main": "assets/js/algorithm.js",
+  "scripts": {
+    "test": "node --test tests/algorithm.test.js tests/parity.test.js",
+    "test:algo": "node --test tests/algorithm.test.js",
+    "test:parity": "node --test tests/parity.test.js",
+    "test:python": "python test_scheduler.py",
+    "start": "python -m http.server 8080"
+  },
+  "keywords": [
+    "job-sequencing",
+    "deadline-scheduler",
+    "greedy-algorithm",
+    "daa"
+  ],
+  "author": "",
+  "license": "MIT",
+  "private": true
+}
