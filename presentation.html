@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deadline Scheduler — Presentation Deck (12 Slides)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card-bg: #1e293b;
+      --card-bg-alt: #0f172a;
+      --border: #334155;
+      --border-light: #475569;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-sub: #64748b;
+      --cyan: #38bdf8;
+      --indigo: #818cf8;
+      --emerald: #10b981;
+      --rose: #f43f5e;
+      --amber: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #020617;
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Presentation Container (16:9 Widescreen) */
+    .deck-container {
+      width: 100%;
+      max-width: 1200px;
+      aspect-ratio: 16 / 9;
+      position: relative;
+      background: var(--bg);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      height: 100%;
+      padding: 40px 50px 32px 50px;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      opacity: 0;
+      transition: opacity 0.25s ease-in-out;
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Header */
+    .slide-header {
+      margin-bottom: 24px;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--cyan);
+      margin-bottom: 6px;
+    }
+    .slide-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+    }
+    .slide-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Body */
+    .slide-content {
+      flex: 1;
+      display: flex;
+      gap: 20px;
+      min-height: 0;
+    }
+
+    .col { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card-alt { background: var(--card-bg-alt); }
+    .card-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .card-desc {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .bullet-list li {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      position: relative;
+      padding-left: 18px;
+    }
+    .bullet-list li::before {
+      content: "•";
+      position: absolute;
+      left: 2px;
+      color: var(--cyan);
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    /* Code & Tables */
+    pre, code {
+      font-family: 'JetBrains Mono', Consolas, monospace;
+    }
+    .code-box {
+      background: #060a12;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: var(--cyan);
+      line-height: 1.5;
+      white-space: pre;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    th, td {
+      padding: 9px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #0a0f1d;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    td { color: var(--text-muted); }
+
+    /* Footer */
+    .slide-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    /* Controls Bar */
+    .controls {
+      margin-top: 18px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 30px;
+      backdrop-filter: blur(8px);
+    }
+    .btn {
+      background: var(--card-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--cyan);
+      color: #020617;
+      border-color: var(--cyan);
+    }
+    .btn-primary {
+      background: var(--cyan);
+      color: #020617;
+      border-color: var(--cyan);
+    }
+    .btn-primary:hover {
+      background: #7dd3fc;
+    }
+    .slide-counter {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      min-width: 90px;
+      text-align: center;
+    }
+
+    /* Title Slide Custom */
+    .hero-card {
+      background: radial-gradient(circle at top left, #1e293b, #0f172a);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 36px 42px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      justify-content: center;
+      height: 100%;
+    }
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      background: linear-gradient(135deg, #ffffff 40%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .grid-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      height: 100%;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      height: 100%;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container" id="deckContainer">
+
+    <!-- SLIDE 1: TITLE -->
+    <div class="slide active" data-slide="1">
+      <div class="hero-card">
+        <div>
+          <span class="badge-pill">ALGORITHM LAB &amp; RESILIENCE PLATFORM</span>
+        </div>
+        <h1 class="hero-title">Deadline Scheduler</h1>
+        <p style="font-size: 1.25rem; font-weight: 600; color: var(--indigo);">
+          Optimal Job Sequencing with Deadlines &amp; Critical Time Slot Resilience Analysis
+        </p>
+        <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 850px; line-height: 1.5;">
+          Building maximum-profit baseline schedules and identifying single-point time bottlenecks whose unexpected failure causes the catastrophic loss of operational yield.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 10px;">
+          <div class="card card-alt" style="padding: 12px;">
+            <div class="card-badge" style="color: var(--cyan);">OPTIMAL GREEDY</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Exchange-optimal backward slot allocation</div>
+          </div>
+          <div class="card card-alt" style="padding: 12px;">
+            <div class="card-badge" style="color: var(--rose);">CRITICAL SEARCH</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Deterministic maximum profit drop search</div>
+          </div>
+          <div class="card card-alt" style="padding: 12px;">
+            <div class="card-badge" style="color: var(--emerald);">DUAL RUNTIME</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">100% verified Python &amp; Node.js parity</div>
+          </div>
+          <div class="card card-alt" style="padding: 12px;">
+            <div class="card-badge" style="color: var(--amber);">WEB DASHBOARD</div>
+            <div style="font-size: 0.8rem; color: var(--text-muted);">Zero-dependency responsive SPA visualizer</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Author: vennuprajwal • Design &amp; Analysis of Algorithms Lab</span>
+        <span>Slide 1 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <div class="slide" data-slide="2">
+      <div class="slide-header">
+        <span class="eyebrow">01 / Problem Statement</span>
+        <h2 class="slide-title">The Challenge: Job Sequencing &amp; Slot Fragility</h2>
+        <p class="slide-subtitle">Balancing profit maximization against the vulnerability of unexpected slot losses.</p>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3" style="width: 100%;">
+          <div class="card">
+            <span class="card-badge" style="color: var(--cyan);">FOUNDATION</span>
+            <div class="card-title">1. Classic Job Sequencing</div>
+            <ul class="bullet-list">
+              <li><strong>n jobs</strong> with unique ID, deadline <code>d &isin; [1..H]</code>, and profit <code>p &gt; 0</code>.</li>
+              <li><strong>Unit execution</strong>: Each job requires exactly one discrete time slot.</li>
+              <li><strong>Feasibility</strong>: A job must complete on or before its deadline (<code>slot &le; d</code>).</li>
+              <li><strong>Capacity</strong>: One job per slot; unassigned jobs are permanently rejected.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="card-badge" style="color: var(--rose);">THE BOTTLENECK</span>
+            <div class="card-title">2. Slot Fragility Vulnerability</div>
+            <ul class="bullet-list">
+              <li>Traditional models assume 100% guaranteed slot availability.</li>
+              <li>Real environments face pre-existing blocked slots (<code>k</code>) and random failures.</li>
+              <li><strong>Fragility Risk</strong>: A schedule maximizing baseline profit can collapse if a single bottleneck slot fails.</li>
+              <li>Lacking resilience, slot removal triggers cascading job displacements.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="card-badge" style="color: var(--amber);">OBJECTIVES</span>
+            <div class="card-title">3. Dual-Objective Mission</div>
+            <ul class="bullet-list">
+              <li><strong>Objective 1</strong>: Compute maximum baseline profit &amp; slot assignments.</li>
+              <li><strong>Objective 2</strong>: Enumerate rejected jobs in strict input order.</li>
+              <li><strong>Objective 3</strong>: Detect the <strong>Critical Slot</strong> whose loss causes maximum profit loss.</li>
+              <li><strong>Tie-break</strong>: Deterministically pick smallest slot index on equal loss.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 2 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: REAL-WORLD MOTIVATION -->
+    <div class="slide" data-slide="3">
+      <div class="slide-header">
+        <span class="eyebrow">02 / Real-World Motivation</span>
+        <h2 class="slide-title">Why Single-Slot Resilience Matters in Industry</h2>
+        <p class="slide-subtitle">From cloud infrastructure to high-precision manufacturing: failure to anticipate slot loss is costly.</p>
+      </div>
+      <div class="slide-content" style="flex-direction: column;">
+        <div class="card" style="padding: 16px 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div class="card-title" style="color: var(--cyan);">Cloud Computing &amp; Spot Instances</div>
+            <span class="badge-pill">INFRASTRUCTURE</span>
+          </div>
+          <p class="card-desc">Spot VMs and preemptible instances can be terminated by cloud providers with 30-second notice. In batch processing, losing an operational execution window without precomputed resilience causes severe SLA breach penalties.</p>
+        </div>
+        <div class="card" style="padding: 16px 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div class="card-title" style="color: var(--amber);">Automated Manufacturing &amp; Assembly</div>
+            <span class="badge-pill" style="color: var(--amber); border-color: rgba(245,158,11,0.3);">MANUFACTURING</span>
+          </div>
+          <p class="card-desc">Robotic assembly lines and CNC work-cells operate on rigid discretized cycles. When thermal trips or sensor calibrations knock out a processing cycle, schedulers must instantly reroute tasks to prevent cascading line shutdowns.</p>
+        </div>
+        <div class="card" style="padding: 16px 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div class="card-title" style="color: var(--indigo);">Airport Runway &amp; Logistics Horizons</div>
+            <span class="badge-pill" style="color: var(--indigo); border-color: rgba(129,140,248,0.3);">LOGISTICS</span>
+          </div>
+          <p class="card-desc">Runway landing slots and container crane operations are strictly bounded discrete slots. Sudden runway closures require instant contingency plans. Knowing the most critical slot allows pre-positioning backup capacity.</p>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 3 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: OUR SOLUTION -->
+    <div class="slide" data-slide="4">
+      <div class="slide-header">
+        <span class="eyebrow">03 / Our Solution</span>
+        <h2 class="slide-title">The Dual-Engine Approach: Greedy &amp; Resilience</h2>
+        <p class="slide-subtitle">A unified mathematical framework delivering optimal baseline profit and guaranteed resilience analysis.</p>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2x2" style="width: 100%;">
+          <div class="card">
+            <span class="card-badge" style="color: var(--emerald);">TIER 1: OPTIMAL BASELINE</span>
+            <div class="card-title">Greedy Profit Maximizer</div>
+            <ul class="bullet-list">
+              <li><strong>Single Pre-Sort</strong>: Sorts all <code>n</code> jobs once by profit descending, breaking ties by ascending Job ID.</li>
+              <li><strong>Latest Feasible Slot Allocation</strong>: Scans backward from deadline <code>d</code> down to 1. Claims latest free available slot.</li>
+              <li><strong>Preservation Principle</strong>: Using the latest slot preserves earlier slots for jobs with tighter deadlines.</li>
+              <li><strong>Exchange Optimality</strong>: Provably optimal via the Greedy Exchange Argument.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="card-badge" style="color: var(--rose);">TIER 2: RESILIENCE ENGINE</span>
+            <div class="card-title">Critical-Slot Search Engine</div>
+            <ul class="bullet-list">
+              <li><strong>Exhaustive Testing</strong>: Iterates through every originally available slot <code>s &isin; [1..H]</code>, including empty slots.</li>
+              <li><strong>Isolated Rebuild</strong>: Marks slot <code>s</code> unavailable and solves anew from the pre-sorted job list in <code>O(n &times; H)</code>.</li>
+              <li><strong>Exact Delta Computation</strong>: Evaluates <code>Loss(s) = BaseProfit - Profit(H \ {s})</code>.</li>
+              <li><strong>Deterministic Tie-Breaker</strong>: First maximum wins ties (smallest slot number).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 4 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: WORKFLOW PIPELINE -->
+    <div class="slide" data-slide="5">
+      <div class="slide-header">
+        <span class="eyebrow">04 / Workflow Pipeline</span>
+        <h2 class="slide-title">Main Workflow: End-to-End Execution Flow</h2>
+        <p class="slide-subtitle">A 5-stage deterministic pipeline from input ingestion to resilient schedule report.</p>
+      </div>
+      <div class="slide-content" style="flex-direction: column; gap: 14px;">
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+          <div class="card card-alt" style="padding: 14px;">
+            <span class="card-badge" style="color: var(--cyan);">STAGE 1</span>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 4px;">Input Parsing</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Parses n, H, k, blocked slots, and job tuples (id, deadline, profit).</div>
+          </div>
+          <div class="card card-alt" style="padding: 14px;">
+            <span class="card-badge" style="color: var(--indigo);">STAGE 2</span>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 4px;">Pre-Sorting</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Sorts jobs once: Profit (&darr;), Job ID (&uarr;). Order reused everywhere.</div>
+          </div>
+          <div class="card card-alt" style="padding: 14px;">
+            <span class="card-badge" style="color: var(--emerald);">STAGE 3</span>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 4px;">Baseline Solve</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Greedy backward slot assignment. Collects baseline profit and rejected jobs.</div>
+          </div>
+          <div class="card card-alt" style="padding: 14px;">
+            <span class="card-badge" style="color: var(--amber);">STAGE 4</span>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 4px;">Perturbation</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Simulates removal of each slot s &isin; Available. Computes loss delta.</div>
+          </div>
+          <div class="card card-alt" style="padding: 14px;">
+            <span class="card-badge" style="color: var(--rose);">STAGE 5</span>
+            <div style="font-weight: 700; font-size: 0.9rem; margin-top: 4px;">Critical Report</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Selects worst-case bottleneck slot. Emits standardized 7-line schema.</div>
+          </div>
+        </div>
+        <div class="card card-alt" style="padding: 12px 18px;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: var(--cyan); margin-bottom: 6px;">STANDARDIZED CLI OUTPUT PROTOCOL (Sample 1)</div>
+          <div class="code-box" style="padding: 8px 12px; font-size: 0.78rem;">BASE_PROFIT 142  |  BASE_SLOTS 3 1 5  |  REJECTED 2 2 4  |  CRITICAL_SLOT 1  |  LOSS 27  |  AFTER_PROFIT 115  |  AFTER_SLOTS 0 1 5</div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 5 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: COMPLEXITY & CORRECTNESS -->
+    <div class="slide" data-slide="6">
+      <div class="slide-header">
+        <span class="eyebrow">05 / Complexity &amp; Proofs</span>
+        <h2 class="slide-title">Theoretical Guarantees &amp; Runtime Bounds</h2>
+        <p class="slide-subtitle">Mathematical proof of optimality combined with tight asymptotic complexity bounds.</p>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2x2" style="width: 100%;">
+          <div class="card">
+            <div class="card-title" style="color: var(--cyan);">Complexity Analysis</div>
+            <table>
+              <thead>
+                <tr><th>Phase</th><th>Time</th><th>Space</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1. Sort jobs once</td><td><code style="color:var(--cyan)">O(n log n)</code></td><td><code>O(n)</code></td></tr>
+                <tr><td>2. Baseline schedule</td><td><code style="color:var(--cyan)">O(n &times; H)</code></td><td><code>O(H)</code></td></tr>
+                <tr><td>3. Critical rebuilds</td><td><code style="color:var(--rose)">O(n &times; H&sup2;)</code></td><td><code>O(H)</code></td></tr>
+                <tr><td><strong>Total System</strong></td><td><strong style="color:var(--emerald)">O(n log n + n &times; H&sup2;)</strong></td><td><strong>O(n + H)</strong></td></tr>
+              </tbody>
+            </table>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; line-height: 1.4;">
+              <strong>Benchmark Specs</strong>: For n &le; 200, H &le; 60, total operations &le; 720,000 (&lt; 2ms latency). Sorting once avoids the naive O(H &times; n log n) trap.
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="color: var(--indigo);">Proof of Correctness</div>
+            <ul class="bullet-list">
+              <li><strong>Lemma 1 (Optimality)</strong>: Placing jobs in latest free feasible slot preserves earlier slots for tighter deadlines without loss of generality.</li>
+              <li><strong>Lemma 2 (Exhaustive Coverage)</strong>: The lost slot must belong to the original available set. Testing all candidates guarantees identifying the global maximum loss.</li>
+              <li><strong>Lemma 3 (Rebuild Soundness)</strong>: Rerunning greedy from the pre-sorted list without slot s produces the optimal contingency assignment.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 6 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: ARCHITECTURE -->
+    <div class="slide" data-slide="7">
+      <div class="slide-header">
+        <span class="eyebrow">06 / Architecture</span>
+        <h2 class="slide-title">Cross-Platform Dual-Runtime Architecture</h2>
+        <p class="slide-subtitle">Shared algorithmic core powering high-speed CLI streams and a zero-dependency web platform.</p>
+      </div>
+      <div class="slide-content" style="flex-direction: column;">
+        <div class="card">
+          <span class="card-badge" style="color: var(--cyan);">LAYER 1: PRESENTATION &amp; SPA ROUTER</span>
+          <div class="card-title">Zero-Dependency Interactive Web Dashboard</div>
+          <p class="card-desc">Pure HTML5, CSS custom properties, and Vanilla ES2022. Client-side hash routing (<code>#/overview</code>, <code>#/jobs</code>, <code>#/visualization</code>, <code>#/critical</code>, <code>#/tests</code>, <code>#/complexity</code>). Instant load time (&lt; 30ms), 100% offline-capable.</p>
+        </div>
+        <div class="card">
+          <span class="card-badge" style="color: var(--emerald);">LAYER 2: ISOMORPHIC SCHEDULING CORE</span>
+          <div class="card-title">Dual-Engine Parity: Python Reference &amp; JavaScript Core</div>
+          <p class="card-desc">Universal CommonJS / ES Module (<code>assets/js/algorithm.js</code>) and Python reference CLI (<code>deadline_scheduler.py</code>). Bit-for-bit identical results with deterministic tie-breaking logic.</p>
+        </div>
+        <div class="card">
+          <span class="card-badge" style="color: var(--amber);">LAYER 3: VERIFICATION &amp; QA</span>
+          <div class="card-title">Automated Cross-Language Parity Test Suite</div>
+          <p class="card-desc">Unit tests in Python and Node.js + parity runner with 120 randomized stress permutations. In-browser test runner allows instant verification inside the web dashboard.</p>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 7 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: KEY FEATURES -->
+    <div class="slide" data-slide="8">
+      <div class="slide-header">
+        <span class="eyebrow">07 / Key Features</span>
+        <h2 class="slide-title">Interactive Visualization &amp; Decision-Support Tools</h2>
+        <p class="slide-subtitle">Transforming abstract algorithmic concepts into intuitive visual diagnostics.</p>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2x2" style="width: 100%;">
+          <div class="card">
+            <span class="card-badge" style="color: var(--cyan);">ALGORITHM VISUALIZER</span>
+            <div class="card-title">Step-by-Step Greedy Visualizer</div>
+            <p class="card-desc">Interactive playback controls (Play, Pause, Step-Forward, Step-Backward). Animates candidate job sorting, backward slot search, and real-time slot claiming with color-coded status badges.</p>
+          </div>
+          <div class="card">
+            <span class="card-badge" style="color: var(--rose);">SENSITIVITY ANALYTICS</span>
+            <div class="card-title">Critical Slot Loss Bar Chart</div>
+            <p class="card-desc">Dynamic SVG sensitivity bar chart illustrating profit loss for every candidate slot across the horizon. Highlights the critical slot in crimson and displays exact before-and-after revenue deltas.</p>
+          </div>
+          <div class="card">
+            <span class="card-badge" style="color: var(--amber);">SCHEDULE COMPARISON</span>
+            <div class="card-title">Dual Timeline Gantt View</div>
+            <p class="card-desc">Side-by-side comparative timelines displaying the Baseline Optimal Schedule against the Rebuilt After-Loss Schedule. Instantly reveals displaced jobs, surviving tasks, and retained profit.</p>
+          </div>
+          <div class="card">
+            <span class="card-badge" style="color: var(--indigo);">REAL-TIME SIMULATION</span>
+            <div class="card-title">Dynamic Job &amp; Horizon Configurator</div>
+            <p class="card-desc">Interactive controls allowing users to adjust time horizon H, toggle unavailable slots, and perform CRUD operations on jobs with sub-2ms instant recalculation.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 8 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: DEEP DIVE FEATURES -->
+    <div class="slide" data-slide="9">
+      <div class="slide-header">
+        <span class="eyebrow">08 / Deep-Dive Features</span>
+        <h2 class="slide-title">Engineering Excellence &amp; Platform Refinements</h2>
+        <p class="slide-subtitle">Specialized architectural features ensuring production reliability, compliance, and developer convenience.</p>
+      </div>
+      <div class="slide-content" style="flex-direction: column;">
+        <div class="card" style="padding: 14px 20px;">
+          <div class="card-badge" style="color: var(--emerald);">IN-BROWSER TESTING</div>
+          <div class="card-title">Browser Test Runner (<code>#/tests</code>)</div>
+          <p class="card-desc">Execute official test cases and edge cases directly within the browser UI. Inspect microsecond benchmarks and assertion checks with zero terminal commands.</p>
+        </div>
+        <div class="card" style="padding: 14px 20px;">
+          <div class="card-badge" style="color: var(--cyan);">DATA INTEROPERABILITY</div>
+          <div class="card-title">Standard CLI Import / Export</div>
+          <p class="card-desc">Paste raw space-delimited text directly into the modal or export active schedules to standard competition format and JSON schemas with one click.</p>
+        </div>
+        <div class="card" style="padding: 14px 20px;">
+          <div class="card-badge" style="color: var(--amber);">ACCESSIBILITY &amp; UX</div>
+          <div class="card-title">Accessible Dark &amp; Light Theming</div>
+          <p class="card-desc">WCAG AA compliant contrast ratios across dark mode (#0b1120) and light mode (#ffffff) with localStorage persistence and collapsible sidebar navigation.</p>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 9 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: IMPACT & RESULTS -->
+    <div class="slide" data-slide="10">
+      <div class="slide-header">
+        <span class="eyebrow">09 / Impact &amp; Results</span>
+        <h2 class="slide-title">Quantitative Results &amp; Experimental Validation</h2>
+        <p class="slide-subtitle">Empirical validation across official test benches, stress suites, and operational case studies.</p>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2x2" style="width: 100%;">
+          <div class="card">
+            <span class="card-badge" style="color: var(--cyan);">SAMPLE 1 WORKED EXAMPLE</span>
+            <div class="card-title">Sample 1 Case Study (n=5, H=3, k=0)</div>
+            <ul class="bullet-list">
+              <li><strong>Baseline Profit</strong>: 142 (Jobs 3, 1, 5 assigned; Jobs 2, 4 rejected).</li>
+              <li><strong>Critical Slot Search</strong>: Removing Slot 1 loses 27; removing Slot 2 loses 27.</li>
+              <li><strong>Deterministic Tie-Breaker</strong>: Slot 1 selected (smallest slot index).</li>
+              <li><strong>Protected Profit</strong>: 115 revenue retained under worst-case loss.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="card-badge" style="color: var(--emerald);">EXPERIMENTAL METRICS</span>
+            <div class="card-title">Parity Suite Benchmarks</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;">
+              <div class="card card-alt" style="padding: 10px;">
+                <div style="font-size: 1.4rem; font-weight: 800; color: var(--cyan);">100%</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Pass rate across 120 stress tests</div>
+              </div>
+              <div class="card card-alt" style="padding: 10px;">
+                <div style="font-size: 1.4rem; font-weight: 800; color: var(--emerald);">&lt; 2ms</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Max latency (n=200, H=60)</div>
+              </div>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; line-height: 1.4;">
+              <strong>Strategic Value</strong>: Shifts operational planning from reactive emergency firefighting to deterministic risk mitigation.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 10 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: LIVE DEMO ACCESS -->
+    <div class="slide" data-slide="11">
+      <div class="slide-header">
+        <span class="eyebrow">10 / Live Demo &amp; Access</span>
+        <h2 class="slide-title">Live Demo Access &amp; Usage Walkthrough</h2>
+        <p class="slide-subtitle">Explore the interactive platform directly in your browser or run the reference CLI.</p>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3" style="width: 100%;">
+          <div class="card">
+            <span class="card-badge" style="color: var(--cyan);">1. HOSTED CLOUD APP</span>
+            <div class="card-title">Instant Web Access</div>
+            <ul class="bullet-list">
+              <li><strong>Live URL</strong>:</li>
+            </ul>
+            <div class="code-box" style="font-size: 0.75rem; margin-top: -4px;">https://vennuprajwal.github.io/Deadline-Scheduler/</div>
+            <ul class="bullet-list" style="margin-top: 6px;">
+              <li>Zero installation or setup required.</li>
+              <li>Fully functional on Chrome, Edge, Safari, Firefox.</li>
+              <li>Complete mobile and tablet responsiveness.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="card-badge" style="color: var(--emerald);">2. LOCAL SERVER</span>
+            <div class="card-title">Run Locally in 10s</div>
+            <ul class="bullet-list">
+              <li>Clone &amp; serve static files:</li>
+            </ul>
+            <div class="code-box" style="font-size: 0.75rem; margin-top: -4px;">git clone https://github.com/vennuprajwal/Deadline-Scheduler.git
+cd Deadline-Scheduler
+python -m http.server 8080</div>
+            <ul class="bullet-list" style="margin-top: 6px;">
+              <li>Or double-click <code>dashboard.html</code> directly!</li>
+            </ul>
+          </div>
+          <div class="card">
+            <span class="card-badge" style="color: var(--amber);">3. CLI REFERENCE</span>
+            <div class="card-title">Command-Line Pipeline</div>
+            <ul class="bullet-list">
+              <li>Standard pipe execution:</li>
+            </ul>
+            <div class="code-box" style="font-size: 0.75rem; margin-top: -4px;">python deadline_scheduler.py < input.txt</div>
+            <ul class="bullet-list" style="margin-top: 6px;">
+              <li>Run full test suite:</li>
+            </ul>
+            <div class="code-box" style="font-size: 0.75rem; margin-top: -4px;">npm test
+python test_scheduler.py</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 11 of 12</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: SOURCE & ROADMAP -->
+    <div class="slide" data-slide="12">
+      <div class="slide-header">
+        <span class="eyebrow">11 / Source &amp; Roadmap</span>
+        <h2 class="slide-title">Source Code, Documentation &amp; Future Work</h2>
+        <p class="slide-subtitle">Open-source repository resources, formal documentation, and research extensions.</p>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2x2" style="width: 100%;">
+          <div class="card">
+            <div class="card-title" style="color: var(--cyan);">Open-Source Repositories</div>
+            <ul class="bullet-list">
+              <li><strong>GitHub Repository</strong>: <br><a href="https://github.com/vennuprajwal/Deadline-Scheduler" target="_blank" style="color: var(--cyan); font-family: monospace; font-size: 0.8rem;">https://github.com/vennuprajwal/Deadline-Scheduler</a></li>
+              <li><strong>Comprehensive Write-Up</strong>: <code>code_doc.md</code> &amp; <code>code_doc.pdf</code> in repository.</li>
+              <li><strong>License</strong>: MIT Open Source License.</li>
+              <li><strong>Parity Test Suite</strong>: Included under <code>tests/</code> folder.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-title" style="color: var(--indigo);">Future Research Roadmap</div>
+            <ul class="bullet-list">
+              <li><strong>1. Multi-Processor Horizons</strong>: Parallel machine scheduling across <code>m</code> concurrent processing cores.</li>
+              <li><strong>2. Online Streaming Arrivals</strong>: Competitive algorithms for real-time dynamic job arrival streams.</li>
+              <li><strong>3. Disjoint-Set Union (DSU)</strong>: Path-compression acceleration for near-linear <code>O(n &times; &alpha;(H))</code> baseline solving.</li>
+              <li><strong>4. Concurrent k-Slot Loss</strong>: Evaluating simultaneous multi-slot disruptions.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>Deadline Scheduler — Algorithm Lab | DAA Project</span>
+        <span>Slide 12 of 12</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button class="btn" id="prevBtn">&larr; Prev</button>
+    <div class="slide-counter" id="counter">Slide 1 of 12</div>
+    <button class="btn" id="nextBtn">Next &rarr;</button>
+    <button class="btn" id="fsBtn">&#x26F6; Fullscreen</button>
+  </div>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 12;
+    const slides = document.querySelectorAll('.slide');
+    const counter = document.getElementById('counter');
+
+    function showSlide(n) {
+      if (n < 1) n = 1;
+      if (n > totalSlides) n = totalSlides;
+      currentSlide = n;
+
+      slides.forEach(s => s.classList.remove('active'));
+      document.querySelector(`.slide[data-slide="${currentSlide}"]`).classList.add('active');
+      counter.textContent = `Slide ${currentSlide} of ${totalSlides}`;
+    }
+
+    document.getElementById('prevBtn').addEventListener('click', () => showSlide(currentSlide - 1));
+    document.getElementById('nextBtn').addEventListener('click', () => showSlide(currentSlide + 1));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        showSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        showSlide(currentSlide - 1);
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      }
+    });
+
+    function toggleFullscreen() {
+      const container = document.getElementById('deckContainer');
+      if (!document.fullscreenElement) {
+        container.requestFullscreen().catch(err => alert(err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    document.getElementById('fsBtn').addEventListener('click', toggleFullscreen);
+  </script>
+</body>
+</html>
+
